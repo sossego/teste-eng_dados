@@ -5,16 +5,15 @@ import time
 
 def download_csv():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
+        browser = p.firefox.launch(headless=True)
         page = browser.new_page()
 
         page.goto("https://www.datablist.com/learn/csv/download-sample-csv-files")
 
         time.sleep(5)
         
-        link = page.locator("text=products 1000.csv").first
         with page.expect_download() as download_info:
-            link.click()
+            page.get_by_text("products-1000.csv").click()
         download = download_info.value
         
         download.save_as("products.csv")
@@ -28,8 +27,7 @@ def process_csv(csv_file):
     
     filtered = df[df["Category"] == "Automotive"]
 
-    filtered.sort_values(by="Price", ascending=True)
-    
+    filtered.sort_values(by="Price", ascending=False, inplace=True)
     top5 = filtered.head(5)
 
     result = top5.to_dict(orient="records")
